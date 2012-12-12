@@ -47,37 +47,86 @@ class ReadFVBin {
 
     final ByteBuffer fv = ByteBuffer.wrap(new File("../bonanza_data/fv.bin").bytes).order(LITTLE_ENDIAN)
 
-    void test1() {
+    void testKin() {
         // 28王、38銀、49金（美濃囲い）
         int ou = toIdx(2, 8)
         int gin = toIdx(3, 8)
         for (int kin = 0; kin < 81; kin++) {
-            printValue(ou, gin, kin)
+            // println "${toXY(ou)}王, ${toXY(gin)}銀, ${toXY(kin)}金, value = ${toValue(ou, gin, kin)}"
+
+            print "${toValue(ou, gin, kin)}\t"
+            if (kin % 9 == 8) println()
         }
     }
 
-    void test2() {
+    void testGin() {
         int ou = toIdx(2, 8)
         int kin = toIdx(4, 9)
         for (int gin = 0; gin < 81; gin++) {
-            printValue(ou, gin, kin)
+            // println "${toXY(ou)}王, ${toXY(gin)}銀, ${toXY(kin)}金, value = ${toValue(ou, gin, kin)}"
+
+            print "${toValue(ou, gin, kin)}\t"
+            if (gin % 9 == 8) println()
         }
     }
 
-    void printValue(int ou, int gin, int kin) {
+    void testOu() {
+        int kin = toIdx(4, 9)
+        int gin = toIdx(3, 8)
+        for (int ou = 0; ou < 81; ou++) {
+            // println "${toXY(ou)}王, ${toXY(gin)}銀, ${toXY(kin)}金, value = ${toValue(ou, gin, kin)}"
+
+            print "${toValue(ou, gin, kin)}\t"
+            if (ou % 9 == 8) println()
+        }
+    }
+
+    void testOu2() {
+        // 右の金銀が初期状態
+        int kin = toIdx(4, 9)
+        int gin = toIdx(3, 9)
+        for (int ou = 0; ou < 81; ou++) {
+            // println "${toXY(ou)}王, ${toXY(gin)}銀, ${toXY(kin)}金, value = ${toValue(ou, gin, kin)}"
+
+            print "${toValue(ou, gin, kin)}\t"
+            if (ou % 9 == 8) println()
+        }
+    }
+
+    void testFindMax() {
+        int ou = toIdx(2, 8)
+
+        def values = []
+        for (int gin = 0; gin < 81; gin++) {
+            for (int kin = 0; kin < 81; kin++) {
+                values << [gin, kin, toValue(ou, gin, kin)]
+            }
+        }
+        values.sort { -(it[2] as int) }
+
+        for (def v in values) {
+            println "${toXY(ou)}王, ${toXY(v[0] as int)}銀, ${toXY(v[1] as int)}金, value = ${v[2]}"
+        }
+    }
+
+    short toValue(int ou, int gin, int kin) {
+        assert f_gold >= f_silver
         int pos = pos_n * ou + toPcOnSqPos(f_gold + kin) + (f_silver + gin)
-        println "${toXY(ou)}王, ${toXY(gin)}銀, ${toXY(kin)}金, value = ${fv.getShort(pos * 2)}"
+        return fv.getShort(pos * 2)
     }
 
     int toPcOnSqPos(int i) { i * (i + 1) / 2 as int }
-    int toX(int i) { (i % 9 as int) + 1 }
+    int toX(int i) { 9 - (i % 9 as int) }
     int toY(int i) { (i / 9 as int) + 1 }
-    int toIdx(int x, int y) { (x - 1) + (y - 1) * 9 }
+    int toIdx(int x, int y) { (9 - x) + (y - 1) * 9 }
     String toXY(int i) { "${toX(i)}${toY(i)}" }
 
     public static void main(String[] args) {
         def t = new ReadFVBin()
-        t.test1()
-        t.test2()
+//        t.testKin()
+        t.testGin()
+//        t.testOu()
+//        t.testOu2()
+//        t.testFindMax()
     }
 }
