@@ -45,7 +45,7 @@ class ReadFVBin {
     final static int pos_n = fe_end * (fe_end + 1) / 2 as int
     final static int kkpStartPos = nsquare * pos_n
 
-    final ByteBuffer fv = ByteBuffer.wrap(new File("../bonanza_data/fv.bin").bytes).order(LITTLE_ENDIAN)
+    final ByteBuffer fv = ByteBuffer.wrap(new File("bonanza_data/fv.bin").bytes).order(LITTLE_ENDIAN)
 
     void testKin() {
         // 28王、38銀、49金（美濃囲い）
@@ -93,6 +93,16 @@ class ReadFVBin {
         }
     }
 
+    /** 壁囲い */
+    void testOu3() {
+        int kin = toIdx(4, 9)
+        int gin = toIdx(4, 8)
+        for (int ou = 0; ou < 81; ou++) {
+            print "${toValue(ou, gin, kin)}\t"
+            if (ou % 9 == 8) println()
+        }
+    }
+
     void testFindMax() {
         int ou = toIdx(2, 8)
 
@@ -127,6 +137,7 @@ class ReadFVBin {
         t.testGin()
 //        t.testOu()
 //        t.testOu2()
+//        t.testOu3()
 //        t.testFindMax()
     }
 }
